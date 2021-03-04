@@ -46,6 +46,7 @@ add_library(modengine2 SHARED
         modengine/ext/profiling/main_loop.cpp
         modengine/ext/profiling/thread_hooks.cpp
         modengine/ext/scylla/scyllahide_extension.cpp
+        modengine/ext/runtime_scripting/runtime_scripting.cpp
         modengine/util/hex_string.cpp
         ${OPTICK_SRC})
 

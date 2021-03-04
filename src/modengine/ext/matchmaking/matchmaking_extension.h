@@ -8,6 +8,7 @@
 namespace modengine::ext {
 
 typedef bool (*fpProtobufDeserialize)(void*, unsigned char*, size_t);
+typedef uintptr_t (*fpProtobufSerialize)(void*, unsigned char*);
 
 class MatchmakingExtension : public ModEngineExtension {
 public:

@@ -8,6 +8,7 @@ using namespace spdlog;
 
 void ModEngine::attach()
 {
+    attached = true;
     info("Registering anti-debug and DirectInput hooks");
 
     MemoryScanner memory_scanner;
@@ -37,7 +38,13 @@ void ModEngine::attach()
 
 void ModEngine::detach()
 {
+    attached = false;
     m_hooks.unhook_all();
+}
+
+bool ModEngine::isAttached()
+{
+    return attached;
 }
 
 void ModEngine::register_extension(std::unique_ptr<ModEngineExtension> extension)

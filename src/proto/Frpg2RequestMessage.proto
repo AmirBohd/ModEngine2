@@ -1,4 +1,4 @@
-/* All messages are as From Soft named them in DkS3 */
+/* All messages are as From Soft named them in DkS3 unless stated otherwise */
 
 syntax = "proto2";
 option optimize_for = LITE_RUNTIME;
@@ -37,7 +37,7 @@ message GetServiceStatusResponse{
   required int64 versionnum = 4;
 }
 
-message DateTime {
+message DateTime{
   required uint32 year = 1;
   required uint32 month = 2;
   required uint32 day = 3;
@@ -47,19 +47,134 @@ message DateTime {
   required uint32 tzdiff = 7; // offset from UTC?
 }
 
-message RequestGetAnnounceMessageListResponse {
-  required AnnounceMessageDataList data_list = 1;
+message RequestGetAnnounceMessageListResponse{
+  required AnnounceMessageDataList changes = 1;
+  required AnnounceMessageDataList notices = 2;
 }
 
-message AnnounceMessageDataList {
+message AnnounceMessageDataList{
   repeated AnnounceMessageData items = 1;
 }
 
-message AnnounceMessageData {
+message AnnounceMessageData{
   required uint32 unk01 = 1;
-  required uint32 unk02 = 2;
+  required uint32 order = 2;
   required uint32 unk03 = 3;
   required string header = 4;
   required string message = 5;
   required DateTime date_time = 6;
 }
+
+/* Summon sign messages */
+
+message RequestGetSignList{
+  required uint32 unknownid1 = 1; // 0
+  repeated SignDomainGetInfo signdomaingetinfo = 2;
+  required uint32 unknownid3 = 3; //Seems to be related to online area
+  required MatchingParameter matchingparameter = 4;
+  required SignGetFlags signgetflags = 5;
+}
+
+message RequestGetSignListResponse{
+  required GetSignResult getsignresult = 1;
+}
+
+message SummonSignMessage{
+  required uint32 onlineareaid = 1;
+  required uint32 unknownid2 = 2;
+  optional SignInfo signinfo = 3;
+}
+
+message GetSignResult{
+  optional SignInfo signinfo = 1;
+  repeated SignData signdata = 2;
+}
+
+message SignInfo{
+  required uint32 playerid = 1;
+  required uint32 unknownid2 = 2; //523112317, 523113705
+}
+
+message SignData{
+  required SignInfo signinfo = 1;
+  required uint32 onlineareaid = 2;
+  required MatchingParameter matchingparameter = 3;
+  required string playerstruct = 4;
+  required string steamid = 5;
+  required uint32 unknownid6 = 6; //1
+}
+
+message MatchingParameter{
+  required uint32 unknownid1 = 1; //1350000
+  required uint32 unknownid2 = 2; //2
+  required uint32 unknownid3 = 3; //0
+  required uint32 unknownid4 = 4; //1
+  required uint32 unknownid5 = 5; //0
+  required uint32 soullevel = 6;
+  required uint32 totalgetsoul = 7;
+  optional string unknownstring = 8;
+  required uint32 unknownid9 = 9; //0, 1, 7
+  required string password = 10;
+  required uint32 covenant = 11;
+  required uint32 weaponlevel = 14;
+}
+
+message SignGetFlags{
+  required uint32 unknownid1 = 1; //1
+  required uint32 unknownid2 = 2; //1
+  required uint32 unknownid3 = 3; //0
+}
+
+message SignDomainGetInfo{
+  required uint32 unknownfield1 = 1; //32
+  required uint32 onlineareaid = 2;
+}
+
+/* Player Status Messages */
+/*
+
+message AllStatus{
+  required PlayerLocation playerlocation = 1;
+  required PlayData playdata = 2;
+  required PlayerStatus playerstatus = 3;
+  //Stats info? Log Info? 4
+  //Optional? 5
+  required Equipment equipment = 6;
+  //Steam Id? 7
+}
+
+message PlayerLocation{
+  required uint32 onlineareaidlower = 1;
+  required uint32 onlineareaidupper = 1;
+}
+
+message DefenseInfo{
+  required uint32 physical = 1;
+  required uint32 strike = 2;
+  required uint32 slash = 3;
+  required uint32 thrust = 4;
+  required uint32 magic = 5;
+  required uint32 fire = 6;
+  required uint32 lightning = 7;
+  required uint32 dark = 8;
+}
+
+message CutRateInfo{
+  required float physical = 1;
+  required float strike = 2;
+  required float slash = 3;
+  required float thrust = 4;
+  required float magic = 5;
+  required float fire = 6;
+  required float lightning = 7;
+  required float dark = 8;
+}
+
+message ResistanceInfo{
+  required uint32 bleed = 1;
+  required uint32 poison = 2;
+  required uint32 frost = 3;
+  required uint32 curse = 4;
+}
+
+*/

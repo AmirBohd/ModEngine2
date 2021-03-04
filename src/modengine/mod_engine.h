@@ -6,7 +6,6 @@
 #include "modengine/patch.h"
 #include "modengine/settings.h"
 
-#include <spdlog/spdlog.h>
 #include <map>
 
 namespace modengine {
@@ -24,6 +23,7 @@ public:
 
     void attach();
     void detach();
+    bool isAttached();
 
     void register_extension(std::unique_ptr<ModEngineExtension> extension);
 
@@ -43,6 +43,7 @@ private:
     std::vector<std::unique_ptr<Patch>> m_patches;
     std::vector<std::unique_ptr<ModEngineExtension>> m_extensions;
     std::map<std::string, ExtensionInfo> m_extension_info;
+    bool attached = false;
 };
 
 extern std::shared_ptr<ModEngine> mod_engine_global;

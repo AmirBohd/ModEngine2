@@ -1,0 +1,30 @@
+[modengine]
+debug = true
+
+[mod_loader]
+enabled = false
+loose_params = false
+
+[[mod_loader.mods]]
+path = "AshesLauncher/Ashes/_ashes"
+enabled = false
+
+[scylla_hide]
+enabled = false
+
+[debug_menu]
+enabled = false
+boot_menu = false
+
+[profiling]
+enabled = false
+
+[matchmaking]
+enabled = true
+
+[runtime_scripting]
+enabled = false
+
+[crash_reporter]
+enabled = true
+

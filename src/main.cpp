@@ -6,6 +6,7 @@
 #include "modengine/ext/mod_loader/mod_loader_extension.h"
 #include "modengine/ext/profiling/profiling_extension.h"
 #include "modengine/ext/scylla/scyllahide_extension.h"
+#include "modengine/ext/runtime_scripting/runtime_scripting.h"
 
 #include "modengine/version.h"
 
@@ -83,6 +84,7 @@ int WINAPI modengine_entrypoint(void)
     mod_engine_global->register_extension(std::make_unique<ext::CrashHandlerExtension>(mod_engine_global));
     mod_engine_global->register_extension(std::make_unique<ext::ModLoaderExtension>(mod_engine_global));
     mod_engine_global->register_extension(std::make_unique<ext::MatchmakingExtension>(mod_engine_global));
+    mod_engine_global->register_extension(std::make_unique<ext::RuntimeScriptingExtension>(mod_engine_global));
     mod_engine_global->attach();
 
     return hooked_entrypoint->original();
