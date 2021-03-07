@@ -55,17 +55,6 @@ bool protobuf_deserialize(void* msg, unsigned char* buffer, size_t size)
     handler.handle<RequestGetAnnounceMessageListResponse>([&](auto msg) {
         msg->mutable_changes()->clear_items();
     });
-
-    handler.handle<RequestGetSignListResponse>([&](auto msg) {
-        auto signData = msg->mutable_getsignresult()->mutable_signdata();
-
-        auto newEnd = std::remove_if(signData->begin(), signData->end(), [](const SignData& signDataItr){
-            debug((std::string("Total get soul: ") + std::to_string(signDataItr.matchingparameter().totalgetsoul())).c_str());
-            return signDataItr.matchingparameter().totalgetsoul() != 684534681;
-        });
-
-        signData->erase(newEnd, signData->end());
-    });
     
     auto result = handler.m_result;
 
@@ -89,20 +78,27 @@ uintptr_t protobuf_serialize(void* msg, unsigned char* buffer)
     uintptr_t bufferEnd = hooked_ProtobufSerialize->original(msg, buffer);
 
     auto handler = MessageHandler(kind, buffer, size);
-    
+
     if (kind == "Frpg2RequestMessage.RequestGetSignList") {
-        debug("original length {}, original data {}", size, spdlog::to_hex(buffer, buffer + size));
+        info("GetSignList og length {}, data {}", size, spdlog::to_hex(buffer, buffer + size));
+    }
+    else if (kind == "Frpg2RequestMessage.RequestCreateSign") {
+        info("CreateSign og length {}, data {}", size, spdlog::to_hex(buffer, buffer + size));
     }
 
     handler.handle<RequestGetSignList>([&](auto msg) {
-        msg->mutable_matchingparameter()->set_totalgetsoul(684534681);
+        msg->set_onlineareaid(530000);
     });
 
+    handler.handle<RequestCreateSign>([&](auto msg) {
+        msg->set_onlineareaidlower(530000);
+        msg->set_onlineareaidupper(530000);
+    });
 
     auto result = handler.m_result;
     
     if (result.has_value()) {
-        debug("new length {}, new data {}", result->length(), spdlog::to_hex(result->c_str(), result->c_str() + result->length()));
+        info("new length {}, data {}", result->length(), spdlog::to_hex(result->c_str(), result->c_str() + result->length()));
         memcpy(buffer, result->c_str(), result->length());
         return (uintptr_t)(buffer + result->length());
     }
@@ -114,6 +110,8 @@ void MatchmakingExtension::on_attach()
 {
     hooked_ProtobufDeserialize = register_hook(DS3, 0x141b5ea10, protobuf_deserialize);
     hooked_ProtobufSerialize = register_hook(DS3, 0x141b5ebf0, protobuf_serialize);
+    register_patch(DS3, 0x141b5eb6b, replace_with<unsigned char>({ 0x90, 0x90, 0x90, 0x90, 0x90 }));
+    register_patch(DS3, 0x141b5e4a8, replace_with<unsigned char>({ 0x90, 0x90, 0x90, 0x90, 0x90 }));
 }
 
 void MatchmakingExtension::on_detach()

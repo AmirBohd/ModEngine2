@@ -3,6 +3,8 @@
 syntax = "proto2";
 option optimize_for = LITE_RUNTIME;
 
+import public "proto/Frpg2PlayerData.proto";
+
 package Frpg2RequestMessage;
 
 message RequestQueryLoginServerInfo{
@@ -37,16 +39,6 @@ message GetServiceStatusResponse{
   required int64 versionnum = 4;
 }
 
-message DateTime{
-  required uint32 year = 1;
-  required uint32 month = 2;
-  required uint32 day = 3;
-  required uint32 hours = 4;
-  required uint32 minutes = 5;
-  required uint32 seconds = 6;
-  required uint32 tzdiff = 7; // offset from UTC?
-}
-
 message RequestGetAnnounceMessageListResponse{
   required AnnounceMessageDataList changes = 1;
   required AnnounceMessageDataList notices = 2;
@@ -62,7 +54,11 @@ message AnnounceMessageData{
   required uint32 unk03 = 3;
   required string header = 4;
   required string message = 5;
-  required DateTime date_time = 6;
+  required Frpg2PlayerData.DateTime datetime = 6;
+}
+
+message RequestUpdatePlayerStatus{
+	required Frpg2PlayerData.AllStatus allstatus = 1;
 }
 
 /* Summon sign messages */
@@ -70,7 +66,7 @@ message AnnounceMessageData{
 message RequestGetSignList{
   required uint32 unknownid1 = 1; // 0
   repeated SignDomainGetInfo signdomaingetinfo = 2;
-  required uint32 unknownid3 = 3; //Seems to be related to online area
+  required uint32 onlineareaid = 3; //Seems to be related to online area
   required MatchingParameter matchingparameter = 4;
   required SignGetFlags signgetflags = 5;
 }
@@ -82,7 +78,8 @@ message RequestGetSignListResponse{
 message SummonSignMessage{
   required uint32 onlineareaid = 1;
   required uint32 unknownid2 = 2;
-  optional SignInfo signinfo = 3;
+  required SignInfo signinfo = 3;
+  required string playerstruct = 4;
 }
 
 message GetSignResult{
@@ -92,7 +89,7 @@ message GetSignResult{
 
 message SignInfo{
   required uint32 playerid = 1;
-  required uint32 unknownid2 = 2; //523112317, 523113705
+  required uint32 signinfo = 2;
 }
 
 message SignData{
@@ -102,6 +99,17 @@ message SignData{
   required string playerstruct = 4;
   required string steamid = 5;
   required uint32 unknownid6 = 6; //1
+}
+
+message RequestNotifyCreateSignResult{
+	required Frpg2PlayerData.AllStatus allstatus = 1;
+	required uint32 onlineareaidlower = 2;
+	required uint32 onlineareaidupper = 3;
+	required Frpg2PlayerData.Vector vector = 4;
+	required uint32 signuniquenumber = 5; //528745087
+	required uint32 unknown2 = 6; //0
+	required uint32 unknown3 = 7; //3
+	required uint32 unknown4 = 8; //2
 }
 
 message MatchingParameter{
@@ -130,51 +138,125 @@ message SignDomainGetInfo{
   required uint32 onlineareaid = 2;
 }
 
-/* Player Status Messages */
-/*
-
-message AllStatus{
-  required PlayerLocation playerlocation = 1;
-  required PlayData playdata = 2;
-  required PlayerStatus playerstatus = 3;
-  //Stats info? Log Info? 4
-  //Optional? 5
-  required Equipment equipment = 6;
-  //Steam Id? 7
-}
-
-message PlayerLocation{
+message RequestCreateSign{
   required uint32 onlineareaidlower = 1;
-  required uint32 onlineareaidupper = 1;
+  required uint32 onlineareaidupper = 2;
+  required MatchingParameter matchingparameter = 3;
+  required uint32 unknown = 4;
+  required string playerstruct = 5;
 }
 
-message DefenseInfo{
-  required uint32 physical = 1;
-  required uint32 strike = 2;
-  required uint32 slash = 3;
-  required uint32 thrust = 4;
-  required uint32 magic = 5;
-  required uint32 fire = 6;
-  required uint32 lightning = 7;
-  required uint32 dark = 8;
+message RequestCreateSignResponse{
+  required uint32 signuniquenumber = 1;
 }
 
-message CutRateInfo{
-  required float physical = 1;
-  required float strike = 2;
-  required float slash = 3;
-  required float thrust = 4;
-  required float magic = 5;
-  required float fire = 6;
-  required float lightning = 7;
-  required float dark = 8;
+message RequestSummonSign{
+  required uint32 onlineareaidlower = 1;
+  required uint32 onlineareaidupper = 2;
+  required SignInfo signinfo = 3;
+  required string playerstruct = 4;
 }
 
-message ResistanceInfo{
-  required uint32 bleed = 1;
-  required uint32 poison = 2;
-  required uint32 frost = 3;
-  required uint32 curse = 4;
+message PushRequestRemoveSign{
+  required uint32 signuniquenumber = 1;
+  required SignInfo signinfo = 2;
 }
 
-*/
+
+message PushRequestSummonSign{
+  required uint32 signuniquenumber = 1;
+  required SummonSignMessage summonsignmessage = 2;
+}
+
+message RequestRemoveSign{
+  required uint32 signuniquenumber = 1;
+}
+
+message RequestCreateGhostData{
+  required uint32 onlineareaid = 1;
+  required string ghostdata = 2;
+}
+
+message RequestGetRightMatchingArea{
+  required MatchingParameter matchingparameter = 1;
+  required uint32 unknown = 2;
+}
+
+message RequestGetRightMatchingAreaResponse{
+  repeated RequestGetRightMatchingAreaResponse_Area_info areainfo = 1;
+}
+
+message RequestGetRightMatchingAreaResponse_Area_info{
+  required uint32 onlineareaid = 1;
+  required uint32 unknown = 2;
+}
+
+/* BreakIn Messages */
+
+message RequestGetBreakInTargetList{ //Sent by invader looking for worlds to invade
+	required uint32 onlineareaidlower = 1;
+	required uint32 onlineareaidupper = 2;
+	required uint32 unknown1 = 3;
+	required MatchingParameter matchingparameter = 4;
+	required uint32 unknown2 = 5;
+}
+
+message RequestGetBreakInTargetListResponse{ //Received by invader looking for worlds to invade
+	required uint32 onlineareaidlower = 1;
+	required uint32 onlineareaidupper = 2;
+	repeated BreakInTargetData breakintargetdata = 3;
+}
+
+message BreakInTargetData{
+	required uint32 playerid = 1;
+	required string steamid = 2;
+}
+
+message PushRequestAllowBreakInTarget{ //Received by host, after PushRequestBreakInTarget. Sent by invader
+	required uint32 unknown1 = 1; //935
+	required uint32 playerid = 2; //Host playerid
+	required string data = 3;
+	required uint32 unknown2 = 4;
+}
+
+message RequestSendMessageToPlayers{ //Sent by host sometimes, after PushRequestAllowBreakInTarget
+	required uint32 playerid = 1; //Invading playerid
+	required PushRequestAllowBreakInTarget pushrequestallowbreakintarget = 2;
+}
+
+message PushRequestBreakInTarget{ //Received by host
+  required uint32 unknown1 = 1; ///Same as PushRequestAllowBreakInTarget
+  required uint32 playerid = 2; //Invading playerid
+  required string steamid = 3;
+  required uint32 unknown2 = 4; //Same as PushRequestAllowBreakInTarget
+  required uint32 onlineareaidlower = 5;
+  required uint32 onlineareaidupper = 6;
+}
+
+message RequestNotifyJoinMultiplay{ //Sent on creation of online session
+  required Frpg2PlayerData.AllStatus allstatus = 1;
+  required uint32 onlineareaidlower = 2;
+  required uint32 onlineareaidupper = 3;
+  required uint32 unknown2 = 4;
+  required uint32 unknown3 = 5;
+  repeated PartyMemberInfo partymemberinfo = 6;
+}
+
+message RequestNotifyLeaveMultiplay{ //Sent on leaving online session
+	required Frpg2PlayerData.AllStatus allstatus = 1;
+	required uint32 onlineareaidlower = 2;
+	required uint32 onlineareaidupper = 3;
+	required uint32 unknown2 = 4;
+	required uint32 unknown3 = 5;
+	required uint32 unknown4 = 6;
+	repeated PartyMemberInfo partymemberinfo = 7;
+}
+
+message PartyMemberInfo{
+	required uint32 playerid = 1;
+	required uint32 charid = 2;
+	required uint32 unknown2 = 3;
+	required uint32 unknown4 = 4;
+	required uint32 unknown5 = 5;
+	required uint32 unknown6 = 6;
+}

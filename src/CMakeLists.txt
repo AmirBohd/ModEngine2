@@ -15,6 +15,7 @@ find_package(crashpad CONFIG REQUIRED)
 
 set (Protobuf_USE_STATIC_LIBS ON)
 set (protobuf_MODULE_COMPATIBLE ON)
+set (Protobuf_IMPORT_DIRS ON)
 find_package(Protobuf CONFIG REQUIRED)
 
 # Optick source
@@ -52,7 +53,9 @@ add_library(modengine2 SHARED
 
 include_directories(${Protobuf_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-protobuf_generate(LANGUAGE cpp TARGET modengine2 PROTOS proto/Frpg2RequestMessage.proto)
+protobuf_generate(LANGUAGE cpp TARGET modengine2 PROTOS
+        proto/Frpg2RequestMessage.proto
+        proto/Frpg2PlayerData.proto)
 
 if (NOT MODENGINE_NO_DINPUT8)
     set_target_properties(modengine2 PROPERTIES OUTPUT_NAME "dinput8")
@@ -70,7 +73,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         message(FATAL_ERROR "Clang frontend must be MSVC. Current frontend '${CMAKE_CXX_SIMULATE_ID}' is unsupported")
     endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL  "MSVC")
-    target_compile_options(modengine2 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:/utf-8 /experimental:external /external:anglebrackets /external:W0 /W4 /WX>)
+    target_compile_options(modengine2 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:/utf-8 /experimental:external /external:anglebrackets /external:W0 /W4>)
     target_compile_definitions(modengine2 PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
 endif()
 
